@@ -1,0 +1,23 @@
+# Python and Django related
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+db.sqlite3
+.env
+.env.local
+*.sqlite3
+
+# Virtual environment
+venv/
+.env/
+*.log
+
+# IDE and editor files
+.vscode/
+.idea/
+*.iml
+
+# Migrations (Optional: Keep if you want a fresh start)
+**/migrations/*.py
+!**/migrations/__init__.py
