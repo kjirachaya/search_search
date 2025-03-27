@@ -37,6 +37,7 @@ class TestRecord(models.Model):
     specimen = models.ManyToManyField(Specimen, null=True, blank=True)
     principle = models.ManyToManyField(Principle, null=True, blank=True)
     container = models.ManyToManyField(Container, null=True, blank=True)
+    is_active = models.BooleanField(default=True)
     
     def __str__(self):
         return self.test_id + " - " + self.test_name
