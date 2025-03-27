@@ -3,144 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}{% endblock %}</title>
-  {% load bootstrap5 %}
-  {% bootstrap_css %}
-  {% bootstrap_javascript %}
+    <title>{% block title %}{% endblock %}</title>
+    {% load bootstrap5 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
 </head>
 <body>
 <div class="container mt-4">
-    <h2 class="text-center mb-4">Search Programs</h2>
+    <h2 class="text-center mb-4">ค้นหารายการทดสอบ</h2>
 
     <!-- Search Form -->
     <form method="GET" action="{% url 'search' %}" class="mb-4">
         <div class="input-group">
-            <input type="text" name="q" class="form-control" placeholder="Search programs..." value="{{ query }}">
-            <button type="submit" class="btn btn-primary">Search</button>
+            <input type="text" name="q" class="form-control" placeholder="โปรดใส่รหัส,คีย์เวิร์ดที่ต้องการค้นหา" value="{{ query }}">
+            <button type="submit" class="btn btn-primary">ค้นหา</button>
         </div>
     </form>
 
     {% if results %}
-        <ul class="list-group">
+    <!-- Table of Test Records -->
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Test ID</th>
+                <th>Test Name</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
             {% for record in results %}
-            <li class="list-group-item d-flex align-items-center">
-                <!-- Clickable TestRecord Image -->
-                {% comment %} {% if record.image %}
-                    <img src="{{ record.image.url }}" class="rounded me-3 img-thumbnail" width="100" height="100" 
-                        alt="{{ record.name }}" data-bs-toggle="modal" data-bs-target="#imageModal{{ forloop.counter }}">
-                {% else %}
-                    <img src="https://via.placeholder.com/100" class="rounded me-3 img-thumbnail" width="100" height="100"
-                        alt="No Image Available">
-                {% endif %} {% endcomment %}
-            
-                <!-- Program Info -->
-                <div>
-                    <h5 class="mb-1">{{ record.test_id }} - {{record.test_name}}</h5>
-                    {% comment %} <p class="mb-1"><strong>ชนิดสิ่งส่งตรวจ:</strong> {{ record.specimen }}</p> {% endcomment %}
-                    <!-- Display Multiple Specimens -->
-                    <p><strong>ชนิดสิ่งส่งตรวจ:</strong> 
-                    {% for specimen in record.specimen.all %}
-                        <span class="badge bg-primary">{{ specimen.name }}</span>
-                    {% empty %}
-                        <span class="text-muted">No specimens available</span>
-                    {% endfor %}
-                    </p>
-                    {% if record.volumn %}
-                        <p class="mb-1"><strong>ปริมาตร:</strong> {{ record.volumn }}</p>
-                    {% endif %}
-                    {% if record.turn_around_time %}
-                        <p class="mb-1"><strong>เวลาในการรายงานผล:</strong> {{ record.turn_around_time }}</p>
-                    {% endif %}
-                    {% if record.price %}
-                        <p class="mb-1"><strong>ราคา:</strong> {{ record.price }} บาท</p>
-                    {% endif %}
-                    {% if record.test_date %}
-                        <p class="mb-1"><strong>วันที่ทำการทดสอบ:</strong> {{ record.test_date }}</p>
-                    {% endif %}
-                    
-                    {% comment %} <span class="badge bg-info text-dark">Tags: {{ record.tags }}</span> {% endcomment %}
-                    {% comment %} <span class="badge bg-secondary">Keywords: {{ record.keywords }}</span> {% endcomment %}
-            
-                    <p><strong>หลักการทดสอบ:</strong> 
-                    {% for principle in record.principle.all %}
-                        <span class="mb-1">{{ principle.name }}, </span>
-                    {% endfor %}
-                    </p>
-                    {% if record.reference_value %}
-                        <p class="mb-1"><strong>ค่าอ้างอิง:</strong> {{ record.reference_value }}</p>
-                    {% endif %}
-                    {% if record.transport_media.collect %}
-                        <p class="mb-1"><strong>วิธีเก็บ:</strong> {{ record.transport_media.collect }}</p>
-                    {% endif %}
-                    {% if record.transport_media.transport_and_storage %}
-                        <p class="mb-1"><strong>การนำส่งและการเก็บรักษา:</strong> {{ record.transport_media.transport_and_storage }}</p>
-                    {% endif %}
-                    <p><strong>ภาชนะบรรจุ:</strong> 
-                        {% for container in record.container.all %}
-                            {% if container.collect %}
-                                <span class="badge bg-primary">{{ container.name }} - {{ container.collect }}</span>
-                            {% else %}
-                                <span class="badge bg-primary">{{ container.name }}</span>
-                            {% endif %}
-                        {% empty %}
-                            <span class="text-muted">No container available</span>
-                        {% endfor %}
-                        </p>
-                    {% if record.phone %}
-                        <p class="mb-1"><strong>เบอร์โทร:</strong> {{ record.phone }}</p>
-                    {% endif %}
-                    {% if record.note %}
-                        <p class="mb-1"><strong>หมายเหตุ:</strong> {{ record.note }}</p>
-                    {% endif %}
-                    {% for container in record.container.all %}
-                        {% if container.image %}
-                        {% comment %} <div class="mt-2"> {% endcomment %}
-                            <img src="{{ container.image.url }}" class="rounded img-thumbnail" style="height:200px;"
-                                alt="{{ container.name }}" data-bs-toggle="modal" data-bs-target="#transportImageModal{{ forloop.counter }}">
-                        {% comment %} </div> {% endcomment %}
-                        {% endif %}
-                    {% endfor %}
-                </div>
-            </li>
-            
-            <!-- Modal for TestRecord Image -->
-            <div class="modal fade" id="imageModal{{ forloop.counter }}" tabindex="-1" aria-labelledby="imageModalLabel{{ forloop.counter }}" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">{{ record.test_name }}</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body text-center">
-                            <img src="{{ record.image.url }}" class="img-fluid rounded" alt="{{ record.test_name }}">
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Modal for TransportMedia Image -->
-            {% if record.transport_media.image %}
-            <div class="modal fade" id="transportImageModal{{ forloop.counter }}" tabindex="-1" aria-labelledby="transportImageModalLabel{{ forloop.counter }}" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">{{ record.test_name }}</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body text-center">
-                            <img src="{{ record.transport_media.image.url }}" class="img-fluid rounded" alt="{{ record.transport_media.name }}">
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
+            <tr>
+                <td>{{ record.test_id }}</td>
+                <td>{{ record.test_name }}</td>
+                <td>
+                    <button style="color:white;"class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#detailModal{{ forloop.counter }}">
+                        View Details
+                    </button>
+                </td>
+            </tr>
             {% endfor %}
-        </ul>
+        </tbody>
+    </table>
+
+    <!-- Modals (placed outside the table) -->
+    {% for record in results %}
+    <div class="modal fade" id="detailModal{{ forloop.counter }}" tabindex="-1" aria-labelledby="detailModalLabel{{ forloop.counter }}" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{ record.test_name }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-striped">
+                        <tr><th>Test ID</th><td>{{ record.test_id }}</td></tr>
+                        <tr><th>ชนิดสิ่งส่งตรวจ</th>
+                            <td>
+                                {% for specimen in record.specimen.all %}
+                                    <span class="badge bg-primary">{{ specimen.name }}</span>
+                                {% empty %}
+                                    <span class="text-muted">No specimens available</span>
+                                {% endfor %}
+                            </td>
+                        </tr>
+                        {% if record.volumn %}
+                            <tr><th>ปริมาตร</th><td>{{ record.volumn }}</td></tr>
+                        {% endif %}
+                        {% if record.turn_around_time %}
+                            <tr><th>เวลาในการรายงานผล</th><td>{{ record.turn_around_time }}</td></tr>
+                        {% endif %}
+                        {% if record.price %}
+                            <tr><th>ราคา</th><td>{{ record.price }} บาท</td></tr>
+                        {% endif %}
+                        {% if record.test_date %}
+                            <tr><th>วันที่ทำการทดสอบ</th><td>{{ record.test_date }}</td></tr>
+                        {% endif %}
+                        <tr><th>หลักการทดสอบ</th>
+                            <td>
+                                {% for principle in record.principle.all %}
+                                    {{ principle.name }},
+                                {% endfor %}
+                            </td>
+                        </tr>
+                        {% if record.reference_value %}
+                            <tr><th>ค่าอ้างอิง</th><td>{{ record.reference_value }}</td></tr>
+                        {% endif %}
+                        {% if record.transport_media.collect %}
+                            <tr><th>วิธีเก็บ</th><td>{{ record.transport_media.collect }}</td></tr>
+                        {% endif %}
+                        {% if record.transport_media.transport_and_storage %}
+                            <tr><th>การนำส่งและการเก็บรักษา</th><td>{{ record.transport_media.transport_and_storage }}</td></tr>
+                        {% endif %}
+                        <tr><th>ภาชนะบรรจุ</th>
+                            <td>
+                                {% for container in record.container.all %}
+                                    <span class="badge bg-primary">{{ container.name }}</span>
+                                {% empty %}
+                                    <span class="text-muted">No container available</span>
+                                {% endfor %}
+                            </td>
+                        </tr>
+                        {% if record.phone %}
+                            <tr><th>เบอร์โทร</th><td>{{ record.phone }}</td></tr>
+                        {% endif %}
+                        {% if record.note %}
+                            <tr><th>หมายเหตุ</th><td>{{ record.note }}</td></tr>
+                        {% endif %}
+                        {% for container in record.container.all %}
+                            {% if container.image %}
+                                <tr><th>Image</th>
+                                    <td><img src="{{ container.image.url }}" class="img-thumbnail" style="height:200px;"></td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
     {% else %}
         <p class="text-center text-muted">No results found.</p>
     {% endif %}
 </div>
-<!-- Bootstrap JS (for Modal to work) -->
+
+<!-- Bootstrap JS (for Modal functionality) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
